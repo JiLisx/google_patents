@@ -10,4 +10,4 @@ class Event:
     def output(self, fs, ida):
         if fs is None:
             return
-        fs.write("{1}{0}{2}{0}{3}\n".format(OUTPUT_FILE_SEPARATOR, ida, self.date, self.code, self.title, self.description))
+        fs.write("{1}{0}{2}{0}{3}{0}{4}{0}{5}\n".format(OUTPUT_FILE_SEPARATOR, ida, self.date, self.code, self.title, self.description))

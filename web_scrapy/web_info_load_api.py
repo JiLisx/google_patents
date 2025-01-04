@@ -18,9 +18,10 @@ def load_patent_info_file(file_path: str, load_proc):
         print("file path %s format" % file_path)
         for line in fs:
             publn = line.replace("\n", "")
+            print("publn: {}".format(publn))
             if is_pt_in_proc_history(publn):
                 print("pt {} is already processed".format(publn))
-                return
+                continue
             else:
                 url = f"https://patents.google.com/patent/{publn}"
                 r = requests.get(url)
@@ -28,7 +29,10 @@ def load_patent_info_file(file_path: str, load_proc):
                     r.encoding = "utf-8"
                     pt_text = r.text
                     pt_tree = etree.HTML(pt_text)
-                    patent_info_proc(pt_tree)
+                    if pt_tree is not None:
+                        patent_info_proc(pt_tree)
+                    else:
+                        print("unvalidated html: {}".format(publn))
     pass
 
 
