@@ -19,7 +19,7 @@ class ProcHistoryMgr:
     def is_pt_in_proc_history(self, pt: str):
         return pt in self.proc_history_pts
 
-    def remove_ut(self, pt: str):
+    def remove_pt(self, pt: str):
         self.proc_history_pts.remove(pt)
 
 
