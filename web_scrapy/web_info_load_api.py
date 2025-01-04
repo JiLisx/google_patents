@@ -33,7 +33,8 @@ def load_patent_info_file(file_path: str, load_proc):
 
 
 def load_patent_input(dir_path: str, load_proc):
-    for dir_v in os.listdir(dir_path):
+    patent_input_path = os.path.join(os.getcwd(), dir_path)
+    for dir_v in os.listdir(patent_input_path):
         dir_tmp = os.path.join(dir_path, dir_v)
         if os.path.isdir(dir_tmp):
             # for a directory, continue to traverse the directory

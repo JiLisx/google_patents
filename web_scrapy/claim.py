@@ -9,4 +9,4 @@ class Claim:
     def output(self, fs, ida):
         if fs is None:
             return
-        fs.write("{1}{0}{2}{0}{3}\n".format(OUTPUT_FILE_SEPARATOR, ida, self.inventor_seq, self.name))
+        fs.write("{1}{0}{2}{0}{3}\n".format(OUTPUT_FILE_SEPARATOR, ida, self.claim_seq, self.claim))

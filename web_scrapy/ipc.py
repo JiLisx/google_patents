@@ -4,7 +4,7 @@ from common_def import OUTPUT_FILE_SEPARATOR
 class IPC:
     def __init__(self, code, ipc_seq):
         self.code = code
-        self.inventor_seq = ipc_seq
+        self.ipc_seq = ipc_seq
 
     def output(self, fs, ida):
         if fs is None:
