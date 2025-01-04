@@ -2,6 +2,7 @@ import os
 
 # OUTPUT_DIR = "paper_output"
 OUTPUT_DIR = "patent_output"
+INPUT_DIR = "patent_input"
 INVENTOR_FILE_NAME = "inventor.txt"
 APPLICANT_FILE_NAME = "applicant.txt"
 IPC_FILE_NAME = "ipc.txt"
