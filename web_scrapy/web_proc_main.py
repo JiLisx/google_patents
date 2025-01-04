@@ -1,3 +1,5 @@
+#!/usr/local/bin/python3
+
 from web_info_load_api import load_patent_input
 from web_info_load_api import patent_info_proc
 from common_def import INPUT_DIR

@@ -189,6 +189,10 @@ class PatentInfo:
                                                        self.num_inventor, self.num_applicant))
         pass
 
+    def output_desc(self):
+        with open(FilePathDef.DESC_FILE_PATH, 'a') as fs:
+            fs.write("{1}{0}{2}\n".format(OUTPUT_FILE_SEPARATOR, self.ida, self.desc))
+        pass
     def output_cite(self, ida):
         with open(FilePathDef.CITE_FILE_PATH, 'a') as fs:
             if self.cite:
@@ -214,4 +218,5 @@ class PatentInfo:
         self.output_applicant()
         self.output_claim()
         self.output_event()
+        self.output_desc()
         pass
