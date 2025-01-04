@@ -5,7 +5,7 @@ codes to parse google patents dump data
 
 It is an OOP approach project to scrap information from patents.google.com
 
-The code structur is : 
+The code structure is : 
 
 
 
