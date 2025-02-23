@@ -1,0 +1,5 @@
+/patent_input/
+/patent_output/
+/description/
+web_scrapy/.DS_Store
+web_scrapy/__pycache__/
