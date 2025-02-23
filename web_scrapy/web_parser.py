@@ -179,7 +179,7 @@ class PatentInfo:
 
     def output_date(self):
         with open(FilePathDef.DATE_FILE_PATH, 'a') as fs:
-            fs.write("{1}{0}{2}\n".format(OUTPUT_FILE_SEPARATOR, self.pnr, self.adate))
+            fs.write("{1}{0}{2}\n".format(OUTPUT_FILE_SEPARATOR, self.ida, self.adate))
         pass
 
     def output_basic(self):
