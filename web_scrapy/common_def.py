@@ -1,17 +1,17 @@
 import os
 
-# OUTPUT_DIR = "paper_output"
-OUTPUT_DIR = "patent_output"
-INPUT_DIR = "patent_input"
-HTML_DIR = "description/invention" 
-HTML_DOWNLOAD_DIR = "description/htmltemp/"
-UTILITY_DIR = "description/utility"
-INVENTION_DIR = "description/invention"
+# Define base directories
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+OUTPUT_DIR = os.path.join(BASE_DIR, "patent_output")
+INPUT_DIR = os.path.join(BASE_DIR, "patent_input")
+HTML_DIR = os.path.join(BASE_DIR, "description")
+UTILITY_DIR = os.path.join(HTML_DIR, "utility")
+INVENTION_DIR = os.path.join(HTML_DIR, "invention")
 
+# Define file names
 INVENTOR_FILE_NAME = "inventor.txt"
 APPLICANT_FILE_NAME = "applicant.txt"
 IPC_FILE_NAME = "ipc.txt"
-# ADDRESS_FILE_NAME = "address.txt"
 DATE_FILE_NAME = "date.txt"
 TITLE_FILE_NAME = "title.txt"
 PUBLN_FILE_NAME = "publn.txt"
@@ -24,8 +24,18 @@ BASIC_FILE_NAME = "basic.txt"
 OUTPUT_FILE_SEPARATOR = "|_"
 PROC_HISTORY_PTS_FILE_NAME = PUBLN_FILE_NAME
 
+# Create necessary directories
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+os.makedirs(INPUT_DIR, exist_ok=True)
+os.makedirs(UTILITY_DIR, exist_ok=True)
+os.makedirs(INVENTION_DIR, exist_ok=True)
 
 class FilePathDef:
+    UTILITY_DIR = UTILITY_DIR
+    INVENTION_DIR = INVENTION_DIR
+    OUTPUT_DIR = OUTPUT_DIR
+    INPUT_DIR = INPUT_DIR
+    
     INVENTOR_FILE_PATH = os.path.join(OUTPUT_DIR, INVENTOR_FILE_NAME)
     APPLICANT_FILE_PATH = os.path.join(OUTPUT_DIR, APPLICANT_FILE_NAME)
     IPC_FILE_PATH = os.path.join(OUTPUT_DIR, IPC_FILE_NAME)
@@ -40,5 +50,4 @@ class FilePathDef:
     EVENT_FILE_PATH = os.path.join(OUTPUT_DIR, EVENT_FILE_NAME)
     BASIC_FILE_PATH = os.path.join(OUTPUT_DIR, BASIC_FILE_NAME)
     PROC_HISTORY_PTS_FILE_PATH = os.path.join(OUTPUT_DIR, PROC_HISTORY_PTS_FILE_NAME)
-    UTILITY_DIR = os.path.join(UTILITY_DIR)
-    INVENTION_DIR = os.path.join(INVENTION_DIR)
+
