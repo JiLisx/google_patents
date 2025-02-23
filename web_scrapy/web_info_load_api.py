@@ -5,7 +5,7 @@ import requests
 from common_def import HTML_DIR, INPUT_DIR
 from mv_html import PatentFileOrganizer
 from lxml import etree
-
+from multiprocessing import Pool
 
 # Put all files which contain the publication number of patents that to be processed in one directory
 
@@ -57,43 +57,50 @@ def get_patent_sets(local_dir: str, input_dir: str) :
     diff_set = input_set - local_set
     return local_set, diff_set
 
+def process_local_patent(pnr):
+    patent, html_path = pnr
+    if is_pt_in_proc_history(patent):
+        print(f"Skipping processed patent {patent}")
+        return
+    with open(html_path, "r", encoding="utf-8") as f:
+        html_content = f.read()
+    pt_tree = etree.HTML(html_content)
+    if pt_tree is not None:
+        patent_info_proc(pt_tree)
+        print(f"Processed local patent {patent}")
+    else:
+        print(f"Error processing local file for {patent}")
+
+def process_download_patent(patent):
+    if is_pt_in_proc_history(patent):
+        print(f"Skipping processed patent {patent}")
+    html_content = get_patent_html(patent)
+    if html_content:
+        pt_tree = etree.HTML(html_content)
+        if pt_tree is not None:
+            patent_info_proc(pt_tree)
+            print(f"Downloaded and processed patent {patent}")
+    else:
+        print(f"Error downloading patent {patent}")
 
 def load_patent_info():
     local_dir = HTML_DIR
     input_dir = INPUT_DIR
-
-    local_set, diff_set = get_patent_sets(local_dir, input_dir)
-
-    # Process local patents
-    for patent in local_set:
-        if not is_pt_in_proc_history(patent):
-            html_path = PatentFileOrganizer.locate_patent_file(patent)
-            if html_path:
-                with open(html_path, "r", encoding="utf-8") as f:
-                    html_content = f.read()
-                pt_tree = etree.HTML(html_content)
-                if pt_tree is not None:
-                    patent_info_proc(pt_tree)
-                    print(f"Processed local patent {patent}")
-                    continue
-                else:
-                    print(f"Could not locate HTML file for {patent}")
-        else:
-            print(f"Skipping processed {patent}")
     
-    # Process patents that need to be download
-    for patent in diff_set:
-        if not is_pt_in_proc_history(patent):
-            html_content = get_patent_html(patent)
-            if html_content:
-                pt_tree = etree.HTML(html_content)
-                if pt_tree is not None:
-                    patent_info_proc(pt_tree)
-                    print(f"Downloaded and processed patent {patent}")
-                    continue
-                else:
-                    print(f"Failed to download patent {patent}")
-        else:
-            print(f"Skipping processed {patent}")
-
-
+    local_set, diff_set = get_patent_sets(local_dir, input_dir)
+    
+    local_patents = []
+    for patent in local_set:
+        html_path = PatentFileOrganizer.locate_patent_file(patent)
+        if html_path:
+            local_patents.append((patent, html_path))
+    
+    with Pool(2) as pool:
+        
+        # Process local patent
+        if local_patents:
+            pool.map(process_local_patent, local_patents)
+        
+        # Downlaod and Process 
+        if diff_set:
+            pool.map(process_download_patent, diff_set)
