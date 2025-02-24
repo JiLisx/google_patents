@@ -34,28 +34,19 @@ def get_patent_html(publn: str) -> str:
         print(f"Download error: {response.status_code}")
         return None
 
-def get_patent_sets(local_dir: str, input_dir: str) :
-    local_set = set()
-    input_set = set()
+def get_patent_sets(local_patents: str, input_dir: str) :
+    local_set = set(patent for patent, _ in local_patents)
+    diff_set = set()
 
-    # Get patent in INPUT DIR
     for root, _, files in os.walk(input_dir):
         for file in files:
             print("Processing files found in patent_input %s" % file)
             with open(os.path.join(root, file), "r") as f:
                 for line in f:
-                    patent = line.strip()
-                    input_set.add(patent)
+                    patents = set(line.strip() for line in f)
+                    diff_set.update(patents - local_set)
 
-    # Get local patent
-    for root, _, files in os.walk(local_dir):
-        for file in files:
-            if file.endswith(".html"):
-                patent = os.path.splitext(file)[0]
-                local_set.add(patent)
-
-    diff_set = input_set - local_set
-    return local_set, diff_set
+    return diff_set
 
 def process_local_patent(pnr):
     patent, html_path = pnr
@@ -86,14 +77,18 @@ def process_download_patent(patent):
 def load_patent_info():
     local_dir = HTML_DIR
     input_dir = INPUT_DIR
-    
-    local_set, diff_set = get_patent_sets(local_dir, input_dir)
-    
+
+    # Get local patents
     local_patents = []
-    for patent in local_set:
-        html_path = PatentFileOrganizer.locate_patent_file(patent)
-        if html_path:
-            local_patents.append((patent, html_path))
+    for root, _, files in os.walk(local_dir):
+        for file in files:
+            if file.endswith(".html"):
+                patent = os.path.splitext(file)[0]
+                html_path = os.path.join(root, file)
+                local_patents.append((patent, html_path))
+                    
+    # Get diff set
+    diff_set = get_patent_sets(local_patents, input_dir)
     
     with Pool(2) as pool:
         
