@@ -35,10 +35,11 @@ class PatentInfo:
         self.adate = ''.join(pt_tree.xpath('//dd/time[@itemprop="filingDate"]/text()')).strip()
         self.pnr = ''.join(pt_tree.xpath('//dd[@itemprop="publicationNumber"]/text()')).strip()
         self.pdate = ''.join(pt_tree.xpath('//dd/time[@itemprop="publicationDate"]/text()')).strip()
-        self.title = ''.join(pt_tree.xpath('//span[@itemprop="title"]/text()')[0]).strip()
-        self.desc = ''.join(pt_tree.xpath('//section[@itemprop="description"]//text()')).replace('\n',
-                                                                                                 "newline").strip()
-
+        title_elements = pt_tree.xpath('//span[@itemprop="title"]/text()')[0]
+        self.title = ''.join(title_elements).strip() if title_elements else ""
+        desc_elements = pt_tree.xpath('//section[@itemprop="description"]//text()')
+        self.desc = ''.join(desc_elements).replace('\n', "newline").strip() if desc_elements else ""
+    
     def load_inventor(self, pt_tree):
         inventors = pt_tree.xpath('//dd[@itemprop="inventor"]/text()')
         self.num_inventor = len(inventors)

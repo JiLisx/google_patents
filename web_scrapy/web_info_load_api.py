@@ -34,25 +34,35 @@ def get_patent_html(publn: str) -> str:
         print(f"Download error: {response.status_code}")
         return None
 
-def get_patent_sets(local_patents: str, input_dir: str) :
-    local_set = set(patent for patent, _ in local_patents)
-    diff_set = set()
-
-    for root, _, files in os.walk(input_dir):
+def get_input_patents():
+    all_patents = set()
+    
+    for root, _, files in os.walk(INPUT_DIR):
         for file in files:
-            print("Processing files found in patent_input %s" % file)
-            with open(os.path.join(root, file), "r") as f:
+            file_path = os.path.join(root, file)
+            print(f"Reading input file: {file_path}")
+            with open(file_path, "r") as f:
                 for line in f:
-                    patents = set(line.strip() for line in f)
-                    diff_set.update(patents - local_set)
+                    patent = line.strip()
+                    if patent:  # 非空行
+                        all_patents.add(patent)
+    
+    return all_patents
 
-    return diff_set
+def get_local_patents():
+    local_patents = []
+    
+    for root, _, files in os.walk(HTML_DIR):
+        for file in files:
+            if file.endswith(".html"):
+                patent = os.path.splitext(file)[0]
+                html_path = os.path.join(root, file)
+                local_patents.append((patent, html_path))
+    
+    return local_patents
 
 def process_local_patent(pnr):
     patent, html_path = pnr
-    if is_pt_in_proc_history(patent):
-        print(f"Skipping processed patent {patent}")
-        return
     with open(html_path, "r", encoding="utf-8") as f:
         html_content = f.read()
     pt_tree = etree.HTML(html_content)
@@ -63,8 +73,6 @@ def process_local_patent(pnr):
         print(f"Error processing local file for {patent}")
 
 def process_download_patent(patent):
-    if is_pt_in_proc_history(patent):
-        print(f"Skipping processed patent {patent}")
     html_content = get_patent_html(patent)
     if html_content:
         pt_tree = etree.HTML(html_content)
@@ -75,27 +83,46 @@ def process_download_patent(patent):
         print(f"Error downloading patent {patent}")
 
 def load_patent_info():
-    local_dir = HTML_DIR
-    input_dir = INPUT_DIR
-
-    # Get local patents
-    local_patents = []
-    for root, _, files in os.walk(local_dir):
-        for file in files:
-            if file.endswith(".html"):
-                patent = os.path.splitext(file)[0]
-                html_path = os.path.join(root, file)
-                local_patents.append((patent, html_path))
-                    
-    # Get diff set
-    diff_set = get_patent_sets(local_patents, input_dir)
+    # Get all input patents
+    all_input_patents = get_input_patents()
+    print(f"Found {len(all_input_patents)} patents in input files")
+    
+    # Skip patents that have been processed
+    patents_to_process = set()
+    for patent in all_input_patents:
+        if is_pt_in_proc_history(patent):
+            print(f"Skipping already processed patent: {patent}")
+        else:
+            patents_to_process.add(patent)
+    
+    print(f"After filtering history, {len(patents_to_process)} patents to process")
+    
+    # If no patents need to be processed, return
+    if not patents_to_process:
+        print("No patents need to be processed.")
+        return
+    
+    # Get all local patents
+    local_patents = get_local_patents()
+    local_patent_set = {patent for patent, _ in local_patents}
+    
+    # Filter out local patents that need to be processed
+    local_patents_to_process = []
+    for patent, path in local_patents:
+        if patent in patents_to_process:
+            local_patents_to_process.append((patent, path))
+    
+    # Patents to download
+    patents_to_download = list(patents_to_process - local_patent_set)
+    
+    print(f"Will process {len(local_patents_to_process)} local patents")
+    print(f"Will download {len(patents_to_download)} patents")
     
     with Pool(2) as pool:
-        
         # Process local patent
-        if local_patents:
-            pool.map(process_local_patent, local_patents)
+        if local_patents_to_process:
+            pool.map(process_local_patent, local_patents_to_process)
         
         # Downlaod and Process 
-        if diff_set:
-            pool.map(process_download_patent, diff_set)
+        if patents_to_download:
+            pool.map(process_download_patent, patents_to_download)
