@@ -35,8 +35,10 @@ class PatentInfo:
         self.adate = ''.join(pt_tree.xpath('//dd/time[@itemprop="filingDate"]/text()')).strip()
         self.pnr = ''.join(pt_tree.xpath('//dd[@itemprop="publicationNumber"]/text()')).strip()
         self.pdate = ''.join(pt_tree.xpath('//dd/time[@itemprop="publicationDate"]/text()')).strip()
-        title_elements = pt_tree.xpath('//span[@itemprop="title"]/text()')[0]
-        self.title = ''.join(title_elements).strip() if title_elements else ""
+        try:
+            self.title = ''.join(pt_tree.xpath('//span[@itemprop="title"]/text()')[0]).strip()
+        except IndexError:
+            self.title = ''.join(pt_tree.xpath('//span[@itemprop="title"]//text()')).strip()
         desc_elements = pt_tree.xpath('//section[@itemprop="description"]//text()')
         self.desc = ''.join(desc_elements).replace('\n', "newline").strip() if desc_elements else ""
     
