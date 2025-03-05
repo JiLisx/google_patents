@@ -35,10 +35,16 @@ class PatentInfo:
         self.adate = ''.join(pt_tree.xpath('//dd/time[@itemprop="filingDate"]/text()')).strip()
         self.pnr = ''.join(pt_tree.xpath('//dd[@itemprop="publicationNumber"]/text()')).strip()
         self.pdate = ''.join(pt_tree.xpath('//dd/time[@itemprop="publicationDate"]/text()')).strip()
-        try:
-            self.title = ''.join(pt_tree.xpath('//span[@itemprop="title"]/text()')[0]).strip()
-        except IndexError:
-            self.title = ''.join(pt_tree.xpath('//span[@itemprop="title"]//text()')).strip()
+        title_elements = pt_tree.xpath('//span[@itemprop="title"]/text()')
+        if title_elements:
+            self.title = ''.join(title_elements[0]).strip()
+        else:
+            # Try alternative XPath pattern
+            alt_title_elements = pt_tree.xpath('//span[@itemprop="title"]//text()')
+            self.title = ''.join(alt_title_elements).strip()
+            # If still empty, try a more generic approach or set a default
+            if not self.title:
+                self.title = ''.join(pt_tree.xpath('//h1//text()')).strip() or "No Title Found"
         desc_elements = pt_tree.xpath('//section[@itemprop="description"]//text()')
         self.desc = ''.join(desc_elements).replace('\n', "newline").strip() if desc_elements else ""
     
