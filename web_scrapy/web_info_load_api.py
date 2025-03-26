@@ -63,14 +63,27 @@ def get_local_patents():
 
 def process_local_patent(pnr):
     patent, html_path = pnr
-    with open(html_path, "r", encoding="utf-8") as f:
-        html_content = f.read()
-    pt_tree = etree.HTML(html_content)
-    if pt_tree is not None:
-        patent_info_proc(pt_tree)
-        print(f"Processed local patent {patent}")
-    else:
-        print(f"Error processing local file for {patent}")
+    encodings = ["utf-8", "latin1", "cp1252", "gbk"]
+    
+    for encoding in encodings:
+        try:
+            with open(html_path, "r", encoding=encoding) as f:
+                html_content = f.read()
+            pt_tree = etree.HTML(html_content)
+            if pt_tree is not None:
+                patent_info_proc(pt_tree)
+                print(f"Processed local patent {patent}")
+                return
+            else:
+                print(f"Error parsing HTML for {patent}")
+                break
+        except UnicodeDecodeError:
+            continue
+        except Exception as e:
+            print(f"Error processing {patent}: {str(e)}")
+            break
+    
+    print(f"Failed to process {patent} with any encoding")
 
 def process_download_patent(patent):
     html_content = get_patent_html(patent)
