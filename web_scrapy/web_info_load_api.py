@@ -18,6 +18,8 @@ def get_patent_html(publn: str) -> str:
     print(f"Downloading {publn}")
     pt_nmb = publn.replace(r".html", "")
     url = f"https://patents.google.com/patent/{pt_nmb}"
+    print(f"Requesting URL: {url}")
+    
     response = requests.get(url, timeout=10)
     response.encoding = "utf-8"
     
@@ -104,7 +106,8 @@ def load_patent_info():
     patents_to_process = set()
     for patent in all_input_patents:
         if is_pt_in_proc_history(patent):
-            print(f"Skipping already processed patent: {patent}")
+            # print(f"Skipping already processed patent: {patent}")
+            pass
         else:
             patents_to_process.add(patent)
     
