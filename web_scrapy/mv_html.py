@@ -53,6 +53,9 @@ class PatentFileOrganizer:
         os.makedirs(target_dir, exist_ok=True)
         
         target_path = os.path.join(target_dir, f"{publn}.html")
+
+        '''
+        # This code is used to move the downloaded patent file to the target directory.
         if os.path.exists(target_path):
             duplicate_dir = os.path.join(target_base, "duplicates")
             os.makedirs(duplicate_dir, exist_ok=True)
@@ -60,9 +63,11 @@ class PatentFileOrganizer:
         else:
             shutil.move(src_path, target_path)
         return target_path
-
-
-
-
-
-
+        '''
+        
+        # This code is used to re-downloaded patent files no matter if they are already downloaded.
+        # Check if the file already exists in the target directory
+        if os.path.exists(target_path):
+            os.remove(target_path)  # delete the existing file
+        shutil.move(src_path, target_path)
+        return target_path

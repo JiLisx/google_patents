@@ -97,6 +97,8 @@ def process_download_patent(patent):
     else:
         print(f"Error downloading patent {patent}")
 
+'''
+# This code is used to move the downloaded patent file to the target directory.
 def load_patent_info():
     # Get all input patents
     all_input_patents = get_input_patents()
@@ -140,5 +142,35 @@ def load_patent_info():
             pool.map(process_local_patent, local_patents_to_process)
         
         # Downlaod and Process 
+        if patents_to_download:
+            pool.map(process_download_patent, patents_to_download)
+'''
+
+# This code is used to re-download patent files no matter if they are already downloaded.
+def load_patent_info():
+    # Get all input patents
+    all_input_patents = get_input_patents()
+    print(f"Found {len(all_input_patents)} patents in input files")
+    
+    # Skip patents that have been processed
+    missing_patents = set()
+    for patent in all_input_patents:
+        if not is_pt_in_proc_history(patent):
+            missing_patents.add(patent)
+    
+    print(f"Found {len(missing_patents)} patents missing from processing history")
+    
+    # If no patents need to be processed, return  
+    if not missing_patents:
+        print("All patents have been processed.")
+        return
+    
+    # Get all local patents  
+    patents_to_download = list(missing_patents)
+    
+    print(f"Will download and process {len(patents_to_download)} patents")
+    
+    with Pool(2) as pool:
+        # Process local patent  
         if patents_to_download:
             pool.map(process_download_patent, patents_to_download)
