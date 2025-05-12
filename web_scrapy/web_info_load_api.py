@@ -170,7 +170,11 @@ def load_patent_info():
     
     print(f"Will download and process {len(patents_to_download)} patents")
     
-    with Pool(2) as pool:
-        # Process local patent  
-        if patents_to_download:
-            pool.map(process_download_patent, patents_to_download)
+    pool = Pool(2)
+    results = []
+    for patent in patents_to_download:
+        result = pool.apply_async(process_download_patent, args=(patent,))
+        results.append(result)
+
+    pool.close()
+    pool.join()
